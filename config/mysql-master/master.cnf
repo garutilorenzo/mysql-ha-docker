@@ -1,0 +1,16 @@
+[mysqld]
+server-id = 2
+log_bin = /var/lib/mysql/mysql-bin
+log_slave_updates = TRUE
+expire-logs-days = 2
+
+# semi sync replication settings #
+plugin-load = "semisync_master.so;semisync_slave.so"
+#loose_rpl_semi_sync_master_enabled = 1
+#loose_rpl_semi_sync_master_timeout = 5000
+
+gtid_mode=ON
+enforce-gtid-consistency=true
+
+report-host = mysqlmaster
+master-info-repository = TABLE

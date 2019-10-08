@@ -1,0 +1,125 @@
+datadir="/var/lib/proxysql"
+
+admin_variables=
+{
+        admin_credentials="admin:proxysql"
+        mysql_ifaces="0.0.0.0:6032"
+        refresh_interval=2000
+}
+
+mysql_variables=
+{
+        threads=8
+        max_connections=2048
+        default_query_delay=0
+        default_query_timeout=36000000
+        have_compress=true
+      	poll_timeout=2000
+        poll_timeout_on_failure=100
+        interfaces="0.0.0.0:3306;0.0.0.0:3307;0.0.0.0:3308;/tmp/mysql.sock"
+        default_schema="information_schema"
+        stacksize=1048576
+        server_version="5.7.26"
+        connect_timeout_server=1000
+        monitor_history=600000
+        monitor_connect_interval=60000
+        monitor_connect_timeout=200
+        monitor_ping_interval=2000
+        monitor_ping_timeout=750
+        monitor_ping_max_failures=1
+        monitor_replication_lag_interval=2000
+        monitor_replication_lag_timeout=1000
+        shun_on_failures=1
+        ping_interval_server_msec=2000
+        ping_timeout_server=200
+        max_allowed_packet=33554432
+        query_cache_size_MB=1024
+        commands_stats=true
+        sessions_sort=true
+        monitor_replication_lag_use_percona_heartbeat="percona.heartbeat"
+        monitor_username="proxysql"
+        monitor_password="ProxySQL"
+}
+
+mysql_replication_hostgroups =
+(
+    {
+        writer_hostgroup=10,
+        reader_hostgroup=20,
+        comment="fast hosts"
+    },
+    {
+        writer_hostgroup=15,
+        reader_hostgroup=30,
+        comment="slow hosts"
+    }
+)
+
+mysql_servers =
+(
+        {
+            address="mysqlmaster",
+            port=3306,
+            hostgroup=10,
+            max_connections=100,
+            max_replication_lag=0
+        },
+        {
+            address="mysqlmaster",
+            port=3306,
+            hostgroup=20,
+            max_connections=100,
+            max_replication_lag=1
+        },
+        {
+            address="mysqlslave",
+            port=3306,
+            hostgroup=20,
+            max_connections=100,
+            max_replication_lag=1
+        },
+        {
+            address="mysqlslave",
+            port=3306,
+            hostgroup=30,
+            max_connections=100,
+            max_replication_lag=3600,
+            comment="slow replica"
+        },
+)
+
+mysql_users =
+(
+        {
+            username="super",
+            password="superLuser",
+            default_hostgroup=10,
+            transaction_persistent=1,
+            active=1
+        },
+)
+
+mysql_query_rules =
+(
+        {
+                rule_id=10
+                active=1
+                proxy_port=3307
+                destination_hostgroup=30
+                apply=1
+        },
+        {
+                rule_id=100
+                active=1
+                proxy_port=3308
+                destination_hostgroup=20
+                apply=1
+        },
+        {
+                rule_id=1000
+                active=1
+                match_pattern=".*"
+                destination_hostgroup=10
+                apply=1
+        }
+)

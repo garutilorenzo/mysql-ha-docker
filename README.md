@@ -9,7 +9,6 @@ Basic MySQL HA environment, for advanced and custom configurations see:
 ## Notes about environment
 
 * MySQL replication is setup with [GTID](https://dev.mysql.com/doc/refman/5.7/en/replication-gtids.html)
-* MySQL slave doesn't start automatically
 
 ## Setting up environment
 

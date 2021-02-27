@@ -41,12 +41,29 @@ if [ "$1" = 'pt-heartbeat' ]; then
     echo "you have to specify a password!"
     exit 1
   fi
+  
+  echo "Waiting for DB init..."
+  sleep 30
 
-  echo "Waiting MySQL Server..."
+  file_env 'PT_SERVERS'
+  if [  ! -z "$PT_SERVERS" ]; then
+    echo "Waiting MySQL Servers..."
+    SERVERS=($(echo "$PT_SERVERS" | tr ',' '\n'))
+    for i in "${!SERVERS[@]}"
+    do
+      echo "Waiting for ${SERVERS[i]}..."
+      until mysql --no-defaults -h "${SERVERS[i]}" -u "$PT_USER" -p"$PT_PASSWORD" "$PT_DATABASE" -nsLNE -e 'exit'; do
+        >&2 echo "MySQL Master is unavailable - sleeping"
+        sleep 5
+      done
+    done
+  fi
 
-  while ! nc -z $PT_MASTER 3306; do
-    sleep 10.0
+  until mysql --no-defaults -h "$PT_MASTER" -u "$PT_USER" -p"$PT_PASSWORD" "$PT_DATABASE" -nsLNE -e 'exit'; do
+    >&2 echo "MySQL Master is unavailable - sleeping"
+    sleep 5
   done
+  
 
   pt-heartbeat -D $PT_DATABASE --update -h $PT_MASTER --user $PT_USER --password $PT_PASSWORD
   while [ $? -ne 0 ]; do

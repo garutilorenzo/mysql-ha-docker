@@ -12,10 +12,8 @@ plugin-load = "semisync_master.so;semisync_slave.so"
 gtid_mode=ON
 enforce-gtid-consistency=true
 
-skip-slave-start
-
 slave_net_timeout = 10
-read_only
+read_only = 1
 
 report-host = mysqlslave
 master-info-repository = TABLE

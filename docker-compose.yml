@@ -2,7 +2,7 @@ version: '3.4'
 services:
   mysqlmaster:
     hostname: mysqlmaster
-    image: mysql-percona-toolkit:5.7.26
+    image: garutilorenzo/mysql-gtid-replication:5.7.33
     build:
      context: mysql/
      args:
@@ -11,16 +11,20 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: password
     volumes:
-      - ./data/mysql-master:/var/lib/mysql/
       - ./grants/:/docker-entrypoint-initdb.d/
-      - ./config/mysql-master:/etc/mysql/conf.d/
+      - ./config/master.cnf:/etc/mysql/mysql.conf.d/mysqld.cnf
+      - type: volume
+        source: mysqlmaster
+        target: /var/lib/mysql
+        volume:
+          nocopy: true
     networks:
        cluster:
           ipv4_address: 172.56.0.2
 
   mysqlslave:
     hostname: mysqlslave
-    image: mysql-percona-toolkit:5.7.26
+    image: garutilorenzo/mysql-gtid-replication:5.7.33
     build:
      context: mysql/
      args:
@@ -29,32 +33,36 @@ services:
     environment:
        MYSQL_ROOT_PASSWORD: password
        MYSQL_MASTER_HOST: mysqlmaster
+       MYSQL_MASTER_USER: root
+       MYSQL_MASTER_PASSWORD: password
        MYSQL_REPLICATION_USER: repl
        MYSQL_REPLICATION_PASSWORD: repl
     volumes:
-      - ./data/dump/:/dump
-      - ./data/mysql-slave:/var/lib/mysql/
-      - ./config/mysql-slave:/etc/mysql/conf.d/
+      - ./config/replica.cnf:/etc/mysql/mysql.conf.d/mysqld.cnf
+      - type: volume
+        source: mysqlslave
+        target: /var/lib/mysql
+        volume:
+          nocopy: true
     networks:
        cluster:
           ipv4_address: 172.56.0.3
 
   proxysql:
     hostname: proxysql
-    image: proxysql:latest
-    build:
-      context: proxysql/
-      args:
-        - http_proxy=$http_proxy
-        - https_proxy=$http_proxy
+    image: severalnines/proxysql:latest
     ports:
       - 3306:3306
       - 3307:3307
       - 3308:3308
       - 6032:6032
     volumes:
-     - ./config/proxysql/proxysql.cnf:/etc/proxysql.cnf
-     - ./data/proxysql:/var/lib/proxysql
+     - ./config/proxysql.cnf:/etc/proxysql.cnf
+     - type: volume
+       source: proxysql
+       target: /var/lib/proxysql
+       volume:
+         nocopy: true
     command: ['proxysql', '-f', '--reload', '-c', '/etc/proxysql.cnf']
     networks:
       cluster:
@@ -65,7 +73,7 @@ services:
 
   heartbeat:
    hostname: heartbeat
-   image: heartbeat:latest
+   image: garutilorenzo/heartbeat:latest
    build:
      context: heartbeat/
      args:
@@ -76,6 +84,8 @@ services:
          ipv4_address: 172.56.0.5
    depends_on:
       - proxysql
+      - mysqlmaster
+      - mysqlslave
    environment:
      PT_MASTER: proxysql
      PT_DATABASE: percona
@@ -84,20 +94,25 @@ services:
 
   orchestrator:
    hostname: orchestrator
-   image: orchestrator:latest
-   build:
-     context: orchestrator/
-     args:
-       - http_proxy=$http_proxy
-       - https_proxy=$http_proxy
+   image: openarkcode/orchestrator:latest
    volumes:
-    - ./config/orchestrator/orchestrator.conf.json:/etc/orchestrator.conf.json
-    - ./data/orchestrator:/app/data
+    - ./config/orchestrator.conf.json:/etc/orchestrator.conf.json
+    - type: volume
+      source: orchestrator
+      target: /app/data
+      volume:
+        nocopy: true
    networks:
       cluster:
          ipv4_address: 172.56.0.7
    ports:
     - "3000:3000"
+
+volumes:
+ mysqlmaster:
+ mysqlslave:
+ proxysql:
+ orchestrator:
 
 networks:
   cluster:

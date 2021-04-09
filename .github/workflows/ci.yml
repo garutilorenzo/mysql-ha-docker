@@ -1,0 +1,34 @@
+name: MySQL HA CI
+
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+    branches:
+    - master
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build Docker images
+      run: docker-compose -f .docker-compose.yml-ci build --pull --no-cache
+    - name: Bringup the environment
+      run: docker-compose -f .docker-compose.yml-ci up -d
+    - name: Sleep for 60 seconds
+      uses: jakejarvis/wait-action@master
+      with:
+        time: '60s'
+    - name: List all containers
+      run: docker ps -a
+    - name: Testing connection to MySQL via ProxySQL port 3306
+      run: docker-compose -f .docker-compose.yml-ci exec -T proxysql mysql -u super -ApsuperLuser -h 127.0.0.1 --port 3306 percona -e 'select * from heartbeat;' 
+    - name: Testing connection to MySQL via ProxySQL port 3307 
+      run: docker-compose -f .docker-compose.yml-ci exec -T proxysql mysql -u super -ApsuperLuser -h 127.0.0.1 --port 3307 percona -e 'select * from heartbeat;' 
+    - name: Testing connection to MySQL via ProxySQL port 3308 
+      run: docker-compose -f .docker-compose.yml-ci exec -T proxysql mysql -u super -ApsuperLuser -h 127.0.0.1 --port 3308 percona -e 'select * from heartbeat;' 

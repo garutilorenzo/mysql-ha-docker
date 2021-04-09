@@ -3,6 +3,11 @@ services:
   mysqlmaster:
     hostname: mysqlmaster
     image: garutilorenzo/mysql-gtid-replication:latest
+    build:
+     context: mysql/
+     args:
+       - http_proxy=$http_proxy
+       - https_proxy=$http_proxy
     environment:
       MYSQL_ROOT_PASSWORD: password
     volumes:
@@ -20,6 +25,11 @@ services:
   mysqlslave:
     hostname: mysqlslave
     image: garutilorenzo/mysql-gtid-replication:latest
+    build:
+     context: mysql/
+     args:
+       - http_proxy=$http_proxy
+       - https_proxy=$http_proxy
     environment:
        MYSQL_ROOT_PASSWORD: password
        MYSQL_MASTER_HOST: mysqlmaster
@@ -64,6 +74,11 @@ services:
   heartbeat:
    hostname: heartbeat
    image: garutilorenzo/heartbeat:latest
+   build:
+     context: heartbeat/
+     args:
+       - http_proxy=$http_proxy
+       - https_proxy=$http_proxy
    networks:
       cluster:
          ipv4_address: 172.56.0.5

@@ -2,7 +2,7 @@ version: '3.4'
 services:
   mysqlmaster:
     hostname: mysqlmaster
-    image: garutilorenzo/mysql-gtid-replication:5.7.33
+    image: garutilorenzo/mysql-gtid-replication:latest
     build:
      context: mysql/
      args:
@@ -24,7 +24,7 @@ services:
 
   mysqlslave:
     hostname: mysqlslave
-    image: garutilorenzo/mysql-gtid-replication:5.7.33
+    image: garutilorenzo/mysql-gtid-replication:latest
     build:
      context: mysql/
      args:

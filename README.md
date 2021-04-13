@@ -1,4 +1,5 @@
 [![GitHub issues](https://img.shields.io/github/issues/garutilorenzo/mysql-ha-docker)](https://github.com/garutilorenzo/mysql-ha-docker/issues)
+[![MySQL HA CI](https://github.com/garutilorenzo/mysql-ha-docker/actions/workflows/ci.yml/badge.svg)](https://github.com/garutilorenzo/mysql-ha-docker/actions/workflows/ci.yml)
 ![GitHub](https://img.shields.io/github/license/garutilorenzo/mysql-ha-docker)
 [![GitHub forks](https://img.shields.io/github/forks/garutilorenzo/mysql-ha-docker)](https://github.com/garutilorenzo/mysql-ha-docker/network)
 [![GitHub stars](https://img.shields.io/github/stars/garutilorenzo/mysql-ha-docker)](https://github.com/garutilorenzo/mysql-ha-docker/stargazers)

@@ -1,3 +1,8 @@
+[![GitHub issues](https://img.shields.io/github/issues/garutilorenzo/mysql-ha-docker)](https://github.com/garutilorenzo/mysql-ha-docker/issues)
+![GitHub](https://img.shields.io/github/license/garutilorenzo/mysql-ha-docker)
+[![GitHub forks](https://img.shields.io/github/forks/garutilorenzo/mysql-ha-docker)](https://github.com/garutilorenzo/mysql-ha-docker/network)
+[![GitHub stars](https://img.shields.io/github/stars/garutilorenzo/mysql-ha-docker)](https://github.com/garutilorenzo/mysql-ha-docker/stargazers)
+
 # MySQL HA with ProxySQL Percona Heartbeat and Orchestrator
 
 Basic MySQL HA environment, for advanced and custom configurations see:

@@ -27,6 +27,8 @@ docker-compose build
 docker-compose up -d
 ```
 
+NOTE: Current `docker-compose.yml` refers to pre-built images, so if you get messages like `mysqlmaster uses an image, skipping` from `docker-compose build`, just proceed with `docker-compose up -d` to download existing ones. Alternately, you can run `docker-compose up --force-recreate` to rebuild locally.
+
 ### Show cluster status
 
 **ProxySQL**

@@ -34,9 +34,9 @@ docker-compose up -d
 Via console:
 
 ```
-docker-compose exec proxyqsl bash
-root@proxysql:/#  mysql -u admin -pproxysql -h 127.0.0.1 -P6032
-select * from stats_mysql_connection_pool;
+yoursystem$ docker-compose exec proxysql bash
+root@proxysql:/# mysql -u admin -pproxysql -h 127.0.0.1 -P6032 -e \
+    'select * from stats_mysql_connection_pool;'
 ```
 
 **Orchestrator**
@@ -50,11 +50,14 @@ http://localhost:3000
 Via console:
 
 ```
-docker-compose exec proxyqsl bash
-root@proxysql:/# mysql -u super -Ap -h 127.0.0.1 -P3306
+yoursystem$ docker-compose exec proxysql bash
+root@proxysql:/# mysql -u super -Ap -h 127.0.0.1 -P3306 -e \
+    'select * from percona.heartbeat;'
 Enter password:
-select * from percona.heartbeat;
 ```
+
+NOTE: the default `superLuser` password for this cluster is defined in `docker-compose.yml` file, in the heartbeat section.
+
 ### Clean all data
 
 ```

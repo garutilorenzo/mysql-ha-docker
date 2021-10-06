@@ -23,8 +23,21 @@ Basic MySQL HA environment, for advanced and custom configurations see:
 Start environment with
 
 ```
-docker-compose build
+docker-compose pull
 docker-compose up -d
+```
+
+If you wish to rebuild the images locally run:
+
+```
+docker-compose -f .docker-compose.yml-ci build
+```
+
+or 
+
+```
+docker build mysql/ -t garutilorenzo/mysql-gtid-replication:latest
+docker build heartbeat/ -t garutilorenzo/heartbeat:latest
 ```
 
 ### Show cluster status

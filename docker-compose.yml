@@ -84,6 +84,7 @@ services:
       - /bin/bash
       - -c
       - |
+        sleep 60
         /usr/local/orchestrator/orchestrator -c clusters
         /usr/local/orchestrator/orchestrator -c discover -i mysqlmaster:3306
         /usr/local/orchestrator/orchestrator -c discover -i mysqlslave:3306

@@ -104,12 +104,12 @@ mysql_get_config() {
 # Do a temporary startup of the MySQL server, for init purposes
 docker_temp_server_start() {
 	if [ "${MYSQL_MAJOR}" = '5.6' ] || [ "${MYSQL_MAJOR}" = '5.7' ]; then
-        if [ "$REPLICA" = 'FALSE' ]; then
-            echo "No log for Master temporany server"
-            "$@" --skip-log-bin --skip-networking --socket="${SOCKET}" &
-        else
-		    "$@" --skip-networking --socket="${SOCKET}" &
-        fi
+		if [ "$REPLICA" = 'FALSE' ]; then
+			echo "No log for Master temporany server"
+			"$@" --skip-log-bin --skip-networking --socket="${SOCKET}" &
+		else
+			"$@" --skip-networking --socket="${SOCKET}" &
+		fi
 		mysql_note "Waiting for server startup"
 		local i
 		for i in {30..0}; do
@@ -166,27 +166,27 @@ docker_create_db_directories() {
 }
 
 setup_gtid_replication() {
-    mysql_note "Setup GTID replication"
-    until mysql --no-defaults -h "$MYSQL_MASTER_HOST" -u "$MYSQL_MASTER_USER" -p"$MYSQL_MASTER_PASSWORD" -nsLNE -e 'exit'; do
-        >&2 echo "MySQL Master is unavailable - sleeping"
-        sleep 5
-    done
+	mysql_note "Setup GTID replication"
+	until mysql --no-defaults -h "$MYSQL_MASTER_HOST" -u "$MYSQL_MASTER_USER" -p"$MYSQL_MASTER_PASSWORD" -nsLNE -e 'exit'; do
+		>&2 echo "MySQL Master is unavailable - sleeping"
+		sleep 5
+	done
 
-    mysqldump --all-databases -flush-privileges --single-transaction --flush-logs --triggers --routines --events -hex-blob --host=$MYSQL_MASTER_HOST --port=3306 --user=$MYSQL_MASTER_USER  --password=$MYSQL_MASTER_PASSWORD > /tmp/mysqlbackup_dump.sql
-    mysql -uroot -p$MYSQL_ROOT_PASSWORD < /tmp/mysqlbackup_dump.sql
-    rm -rf /tmp/mysqlbackup_dump.sql
+	mysqldump --all-databases -flush-privileges --single-transaction --flush-logs --triggers --routines --events -hex-blob --host=$MYSQL_MASTER_HOST --port=3306 --user=$MYSQL_MASTER_USER  --password=$MYSQL_MASTER_PASSWORD > /tmp/mysqlbackup_dump.sql
+	mysql -uroot -p$MYSQL_ROOT_PASSWORD < /tmp/mysqlbackup_dump.sql
+	rm -rf /tmp/mysqlbackup_dump.sql
 
-    mysql -uroot -p$MYSQL_ROOT_PASSWORD -AN -e "RESET MASTER;"
-    mysql -uroot -p$MYSQL_ROOT_PASSWORD -AN -e "RESET SLAVE;"
+	mysql -uroot -p$MYSQL_ROOT_PASSWORD -AN -e "RESET MASTER;"
+	mysql -uroot -p$MYSQL_ROOT_PASSWORD -AN -e "RESET SLAVE;"
 
-    mysql -uroot -p$MYSQL_ROOT_PASSWORD -AN -e "CHANGE MASTER TO MASTER_HOST='$MYSQL_MASTER_HOST', MASTER_USER='$MYSQL_REPLICATION_USER', MASTER_PASSWORD='$MYSQL_REPLICATION_PASSWORD', MASTER_AUTO_POSITION = 1;"
-    
+	mysql -uroot -p$MYSQL_ROOT_PASSWORD -AN -e "CHANGE MASTER TO MASTER_HOST='$MYSQL_MASTER_HOST', MASTER_USER='$MYSQL_REPLICATION_USER', MASTER_PASSWORD='$MYSQL_REPLICATION_PASSWORD', MASTER_AUTO_POSITION = 1;"
+	
 	sleep 5
 	
 	mysql -uroot -p$MYSQL_ROOT_PASSWORD -AN -e "START SLAVE;"
-    mysql -uroot -p$MYSQL_ROOT_PASSWORD -e "SHOW SLAVE STATUS\G;"
+	mysql -uroot -p$MYSQL_ROOT_PASSWORD -e "SHOW SLAVE STATUS\G;"
 
-    mysql_note "Setup GTID replication - End."
+	mysql_note "Setup GTID replication - End."
 }
 
 # initializes the database directory
@@ -214,7 +214,7 @@ docker_setup_env() {
 	declare -g DATADIR SOCKET REPLICA
 	DATADIR="$(mysql_get_config 'datadir' "$@")"
 	SOCKET="$(mysql_get_config 'socket' "$@")"
-    REPLICA=$(mysql_get_config 'read-only' "$@")
+	REPLICA=$(mysql_get_config 'read-only' "$@")
 
 	# Initialize values that might be stored in a file
 	file_env 'MYSQL_ROOT_HOST' '%'
@@ -222,9 +222,9 @@ docker_setup_env() {
 	file_env 'MYSQL_USER'
 	file_env 'MYSQL_PASSWORD'
 	file_env 'MYSQL_ROOT_PASSWORD'
-    file_env 'MYSQL_MASTER_HOST'
-    file_env 'MYSQL_MASTER_USER'
-    file_env 'MYSQL_MASTER_PASSWORD'
+	file_env 'MYSQL_MASTER_HOST'
+	file_env 'MYSQL_MASTER_USER'
+	file_env 'MYSQL_MASTER_PASSWORD'
 
 	declare -g DATABASE_ALREADY_EXISTS
 	if [ -d "$DATADIR/mysql" ]; then
@@ -384,26 +384,26 @@ _main() {
 			# check dir permissions to reduce likelihood of half-initialized database
 			ls /docker-entrypoint-initdb.d/ > /dev/null
 
-            docker_init_database_dir "$@"
-            mysql_note "Starting temporary server"
-            docker_temp_server_start "$@"
-            mysql_note "Temporary server started."
-            docker_setup_db
+			docker_init_database_dir "$@"
+			mysql_note "Starting temporary server"
+			docker_temp_server_start "$@"
+			mysql_note "Temporary server started."
+			docker_setup_db
 
-            if [ "$REPLICA" = 'TRUE' ]; then
-                setup_gtid_replication "$@"
-            else
-                docker_process_init_files /docker-entrypoint-initdb.d/*
-                mysql_expire_root_user
-            fi
+			if [ "$REPLICA" = 'TRUE' ]; then
+				setup_gtid_replication "$@"
+			else
+				docker_process_init_files /docker-entrypoint-initdb.d/*
+				mysql_expire_root_user
+			fi
 
-            mysql_note "Stopping temporary server"
-            docker_temp_server_stop
-            mysql_note "Temporary server stopped"
+			mysql_note "Stopping temporary server"
+			docker_temp_server_stop
+			mysql_note "Temporary server stopped"
 
-            echo
-            mysql_note "MySQL init process done. Ready for start up."
-            echo
+			echo
+			mysql_note "MySQL init process done. Ready for start up."
+			echo
 		fi
 	fi
 	exec "$@"

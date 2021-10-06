@@ -391,6 +391,7 @@ _main() {
 			docker_setup_db
 
 			if [ "$REPLICA" = 'TRUE' ]; then
+				sleep 15
 				setup_gtid_replication "$@"
 			else
 				docker_process_init_files /docker-entrypoint-initdb.d/*

@@ -56,7 +56,7 @@ root@proxysql:/# mysql -u super -Ap -h 127.0.0.1 -P3306 -e \
 Enter password:
 ```
 
-NOTE: the default `superLuser` password for this cluster is defined in `docker-compose.yml` file, in the heartbeat section.
+NOTE: all the cluster's password are defined in grants/users.sql
 
 ### Clean all data
 

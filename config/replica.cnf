@@ -17,3 +17,6 @@ read_only = 1
 
 report-host = mysqlslave
 master-info-repository = TABLE
+
+# https://stackoverflow.com/questions/38500713/mysql-zombie-dump-threads
+slave_net_timeout = 3600

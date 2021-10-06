@@ -47,9 +47,9 @@ docker build heartbeat/ -t garutilorenzo/heartbeat:latest
 Via console:
 
 ```
-docker-compose exec proxyqsl bash
-root@proxysql:/#  mysql -u admin -pproxysql -h 127.0.0.1 -P6032
-select * from stats_mysql_connection_pool;
+docker-compose exec proxysql bash
+root@proxysql:/# mysql -u admin -pproxysql -h 127.0.0.1 -P6032 -e \
+    'select * from stats_mysql_connection_pool;'
 ```
 
 **Orchestrator**
@@ -63,11 +63,14 @@ http://localhost:3000
 Via console:
 
 ```
-docker-compose exec proxyqsl bash
-root@proxysql:/# mysql -u super -Ap -h 127.0.0.1 -P3306
+docker-compose exec proxysql bash
+root@proxysql:/# mysql -u super -Ap -h 127.0.0.1 -P3306 -e \
+    'select * from percona.heartbeat;'
 Enter password:
-select * from percona.heartbeat;
 ```
+
+NOTE: all the cluster's password are defined in grants/users.sql
+
 ### Clean all data
 
 ```

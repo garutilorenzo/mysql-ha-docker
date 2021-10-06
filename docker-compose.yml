@@ -80,6 +80,14 @@ services:
   orchestrator:
    hostname: orchestrator
    image: openarkcode/orchestrator:latest
+   command:
+      - /bin/bash
+      - -c
+      - |
+        /usr/local/orchestrator/orchestrator -c clusters
+        /usr/local/orchestrator/orchestrator -c discover -i mysqlmaster:3306
+        /usr/local/orchestrator/orchestrator -c discover -i mysqlslave:3306
+        /usr/local/orchestrator/orchestrator http
    volumes:
     - ./config/orchestrator.conf.json:/etc/orchestrator.conf.json
     - type: volume

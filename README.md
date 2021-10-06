@@ -34,7 +34,7 @@ docker-compose up -d
 Via console:
 
 ```
-yoursystem$ docker-compose exec proxysql bash
+docker-compose exec proxysql bash
 root@proxysql:/# mysql -u admin -pproxysql -h 127.0.0.1 -P6032 -e \
     'select * from stats_mysql_connection_pool;'
 ```
@@ -50,7 +50,7 @@ http://localhost:3000
 Via console:
 
 ```
-yoursystem$ docker-compose exec proxysql bash
+docker-compose exec proxysql bash
 root@proxysql:/# mysql -u super -Ap -h 127.0.0.1 -P3306 -e \
     'select * from percona.heartbeat;'
 Enter password:

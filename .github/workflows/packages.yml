@@ -40,5 +40,5 @@ jobs:
           IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$HEARTBEAT_IMAGE_NAME
           echo HEARTBEAT_IMAGE_NAME=$HEARTBEAT_IMAGE_NAME
           echo IMAGE_ID=$IMAGE_ID
-          docker tag $HEARTBEAT_IMAGE_NAME $IMAGE_ID
+          docker tag $HEARTBEAT_FULL_IMAGE_NAME $IMAGE_ID
           docker push $IMAGE_ID

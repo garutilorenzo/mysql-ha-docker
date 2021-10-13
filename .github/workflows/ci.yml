@@ -46,14 +46,3 @@ jobs:
         sarif_file: ${{ steps.scan-mysql.outputs.sarif }}
     - name: Inspect action SARIF report
       run: cat ${{ steps.scan-mysql.outputs.sarif }}
-    - uses: anchore/scan-action@v2
-      id: scan-heartbeat
-      with:
-        image: "garutilorenzo/heartbeat:latest"
-        acs-report-enable: true
-    - name: upload Anchore scan SARIF report
-      uses: github/codeql-action/upload-sarif@v1
-      with:
-        sarif_file: ${{ steps.scan-heartbeat.outputs.sarif }}
-    - name: Inspect action SARIF report
-      run: cat ${{ steps.scan-heartbeat.outputs.sarif }}

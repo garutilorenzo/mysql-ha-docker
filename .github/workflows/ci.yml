@@ -33,24 +33,24 @@ jobs:
     - name: Testing connection to MySQL via ProxySQL port 3308 
       run: docker-compose -f .docker-compose.yml-ci exec -T proxysql mysql -u super -ApsuperLuser -h 127.0.0.1 --port 3308 percona -e 'select * from heartbeat;' 
     - uses: anchore/scan-action@v2
-      id: scan
+      id: scan-mysql
       with:
         image: "garutilorenzo/mysql-gtid-replication:latest"
         acs-report-enable: true
     - name: upload Anchore scan SARIF report
       uses: github/codeql-action/upload-sarif@v1
       with:
-        sarif_file: ${{ steps.scan.outputs.sarif }}
+        sarif_file: ${{ steps.scan-mysql.outputs.sarif }}
     - name: Inspect action SARIF report
-      run: cat ${{ steps.scan.outputs.sarif }}
+      run: cat ${{ steps.scan-mysql.outputs.sarif }}
     - uses: anchore/scan-action@v2
-      id: scan
+      id: scan-heartbeat
       with:
         image: "garutilorenzo/heartbeat:latest"
         acs-report-enable: true
     - name: upload Anchore scan SARIF report
       uses: github/codeql-action/upload-sarif@v1
       with:
-        sarif_file: ${{ steps.scan.outputs.sarif }}
+        sarif_file: ${{ steps.scan-heartbeat.outputs.sarif }}
     - name: Inspect action SARIF report
-      run: cat ${{ steps.scan.outputs.sarif }}
+      run: cat ${{ steps.scan-heartbeat.outputs.sarif }}

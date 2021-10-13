@@ -8,8 +8,8 @@ on:
       - v*
 
 env:
-  MYSQL_IMAGE_NAME: garutilorenzo/mysql-gtid-replication:latest
-  HEARTBEAT_IMAGE_NAME: garutilorenzo/heartbeat:latest
+  MYSQL_FULL_IMAGE_NAME: garutilorenzo/mysql-gtid-replication:latest
+  HEARTBEAT_FULL_IMAGE_NAME: garutilorenzo/heartbeat:latest
 
 jobs:
 
@@ -28,11 +28,17 @@ jobs:
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
       - name: Push image
         run: |
+          MYSQL_IMAGE_NAME=${MYSQL_FULL_IMAGE_NAME#*/}
           IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$MYSQL_IMAGE_NAME
+          echo MYSQL_IMAGE_NAME=$MYSQL_IMAGE_NAME
           echo IMAGE_ID=$IMAGE_ID
+          docker tag $MYSQL_FULL_IMAGE_NAME $IMAGE_ID
           docker push $IMAGE_ID
       - name: Push image
         run: |
+          HEARTBEAT_IMAGE_NAME=${HEARTBEAT_FULL_IMAGE_NAME#*/}
           IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$HEARTBEAT_IMAGE_NAME
+          echo HEARTBEAT_IMAGE_NAME=$HEARTBEAT_IMAGE_NAME
           echo IMAGE_ID=$IMAGE_ID
+          docker tag $HEARTBEAT_IMAGE_NAME $IMAGE_ID
           docker push $IMAGE_ID

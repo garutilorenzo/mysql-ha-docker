@@ -1,0 +1,35 @@
+name: MySQL HA Push packages
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - v*
+
+env:
+  MYSQL_IMAGE_NAME: garutilorenzo/mysql-gtid-replication:latest
+  HEARTBEAT_IMAGE_NAME: garutilorenzo/heartbeat:latest
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+
+    steps:
+      - name: Log in to registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      - name: Push image
+        run: |
+          IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$MYSQL_IMAGE_NAME
+          echo IMAGE_ID=$IMAGE_ID
+          docker push $IMAGE_ID
+      - name: Push image
+        run: |
+          IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$HEARTBEAT_IMAGE_NAME
+          echo IMAGE_ID=$IMAGE_ID
+          docker push $IMAGE_ID
